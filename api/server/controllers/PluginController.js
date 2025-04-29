@@ -1,5 +1,6 @@
 const { CacheKeys, AuthType } = require('librechat-data-provider');
 const { addOpenAPISpecs } = require('~/app/clients/tools/util/addOpenAPISpecs');
+const { getToolkitKey } = require('~/server/services/ToolService');
 const { getCustomConfig } = require('~/server/services/Config');
 const { availableTools } = require('~/app/clients/tools');
 const { getMCPManager } = require('~/config');
@@ -108,7 +109,7 @@ const getAvailableTools = async (req, res) => {
     const pluginManifest = availableTools;
     const customConfig = await getCustomConfig();
     if (customConfig?.mcpServers != null) {
-      const mcpManager = await getMCPManager();
+      const mcpManager = getMCPManager();
       await mcpManager.loadManifestTools(pluginManifest);
     }
 
@@ -128,7 +129,7 @@ const getAvailableTools = async (req, res) => {
       (plugin) =>
         toolDefinitions[plugin.pluginKey] !== undefined ||
         (plugin.toolkit === true &&
-          Object.keys(toolDefinitions).some((key) => key.startsWith(`${plugin.pluginKey}_`))),
+          Object.keys(toolDefinitions).some((key) => getToolkitKey(key) === plugin.pluginKey)),
     );
 
     await cache.set(CacheKeys.TOOLS, tools);

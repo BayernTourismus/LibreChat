@@ -541,6 +541,7 @@ export type TStartupConfig = {
   analyticsGtmId?: string;
   instanceProjectId: string;
   bundlerURL?: string;
+  staticBundlerURL?: string;
 };
 
 export enum OCRStrategy {
@@ -855,7 +856,10 @@ export const visionModels = [
   'gpt-4o',
   'gpt-4-turbo',
   'gpt-4-vision',
+  'o4-mini',
+  'o3',
   'o1',
+  'gpt-4.1',
   'gpt-4.5',
   'llava',
   'llava-13b',
@@ -1009,6 +1013,10 @@ export enum CacheKeys {
    * Key for in-progress flow states.
    */
   FLOWS = 'flows',
+  /**
+   * Key for pending chat requests (concurrency check)
+   */
+  PENDING_REQ = 'pending_req',
   /**
    * Key for s3 check intervals per user
    */
@@ -1226,6 +1234,8 @@ export enum Constants {
   NO_PARENT = '00000000-0000-0000-0000-000000000000',
   /** Standard value for the initial conversationId before a request is sent */
   NEW_CONVO = 'new',
+  /** Standard value for the temporary conversationId after a request is sent and before the server responds */
+  PENDING_CONVO = 'PENDING',
   /** Standard value for the conversationId used for search queries */
   SEARCH = 'search',
   /** Fixed, encoded domain length for Azure OpenAI Assistants Function name parsing. */
@@ -1285,6 +1295,8 @@ export enum LocalStorageKeys {
   SHOW_ANALYSIS_CODE = 'showAnalysisCode',
   /** Last selected MCP values per conversation ID */
   LAST_MCP_ = 'LAST_MCP_',
+  /** Last checked toggle for Code Interpreter API per conversation ID */
+  LAST_CODE_TOGGLE_ = 'LAST_CODE_TOGGLE_',
 }
 
 export enum ForkOptions {
@@ -1337,3 +1349,12 @@ export const providerEndpointMap = {
   [EModelEndpoint.anthropic]: EModelEndpoint.anthropic,
   [EModelEndpoint.azureOpenAI]: EModelEndpoint.azureOpenAI,
 };
+
+export const specialVariables = {
+  current_date: true,
+  current_user: true,
+  iso_datetime: true,
+  current_datetime: true,
+};
+
+export type TSpecialVarLabel = `com_ui_special_var_${keyof typeof specialVariables}`;
